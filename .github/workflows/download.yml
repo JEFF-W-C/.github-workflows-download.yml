@@ -14,9 +14,14 @@ jobs:
     
     steps:
       - name: 準備 Python 環境
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5 # 升級到 v5 以解決黃色警告
         with:
           python-version: '3.10'
+
+      - name: 安裝 FFmpeg (用於高畫質影音合併)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
 
       - name: 安裝核心下載套件 (yt-dlp)
         run: pip install yt-dlp
@@ -33,4 +38,4 @@ jobs:
         with:
           name: downloaded-media
           path: downloads/
-          retention-days: 1 # 影片保留 1 天後自動刪除以節省空間
+          retention-days: 1
