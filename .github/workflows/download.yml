@@ -1,0 +1,36 @@
+name: Cloud Video Downloader
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: '請輸入要下載的影片網址 (URL)'
+        required: true
+        type: string
+
+jobs:
+  download-video:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 準備 Python 環境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 安裝核心下載套件 (yt-dlp)
+        run: pip install yt-dlp
+
+      - name: 執行影片下載
+        run: |
+          mkdir downloads
+          cd downloads
+          # 使用最佳畫質與音質合併下載
+          yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" "${{ github.event.inputs.video_url }}"
+
+      - name: 將影片打包上傳為 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: downloaded-media
+          path: downloads/
+          retention-days: 1 # 影片保留 1 天後自動刪除以節省空間
